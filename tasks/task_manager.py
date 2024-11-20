@@ -76,10 +76,43 @@ class TaskManager:
         Returns:
             list: List of tasks matching the criteria.
         """
-        filtered_tasks = self.tasks
-        for key, value in criteria.items():
-            filtered_tasks = [task for task in filtered_tasks if getattr(task, key) == value]
-        return filtered_tasks
+        def matches(task):
+            return all(getattr(task, key) == value for key, value in criteria.items())
+
+        return list(filter(matches, self.tasks))
+    
+    def sort_tasks(self, key="due_date", reverse=False):
+        """
+        Sorts tasks by a specific key.
+        
+        Args:
+            key (str): Attribute to sort by (default: "due_date").
+            reverse (bool): Sort in descending order if True.
+            
+        Returns:
+            list: Sorted list of tasks
+        """
+        return sorted(self.tasks, key=lambda task: getattr(task, key), reverse=reverse)
+    
+    def update_tasks_concurrently(self, updates):
+        """
+        Updates multiple tasks concurrently.
+        
+        Args:
+            updates (list): List of tuples (task_id, {attribute updates}).
+        
+        Returns:
+            list: List of booleans indicating success for each update.
+        """
+        from concurrent.futures import ThreadPoolExecutor
+        
+        def update_task(args):
+            task_id, attrs = args
+            return self.update_task(task_id, **attrs)
+        
+        with ThreadPoolExecutor() as executor:
+            results = list(executor.map(update_task, updates))
+        return results
     
     def _find_task_by_id(self, task_id):
         """Finds a task by its ID"""
