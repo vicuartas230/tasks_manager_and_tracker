@@ -29,4 +29,5 @@ class Task:
         )
         
     def is_overdue(self):
+        """Checks if the task is overdue."""
         return self.due_date < datetime.now()
