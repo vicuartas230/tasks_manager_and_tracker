@@ -30,5 +30,18 @@ class TestTaskManager(unittest.TestCase):
         self.assertEqual(len(filtered), 1)
         self.assertEqual(filtered[0].name, "Task 2")
         
+    def test_sort_tasks(self):
+        sorted_tasks = self.manager.sort_tasks(key="priority")
+        self.assertEqual(sorted_tasks[0].name, "Task 1")
+        
+    def test_update_tasks_concurrently(self):
+        id1 = self.manager.tasks[0].task_id
+        id2 = self.manager.tasks[1].task_id
+        updates = [(id1, {"status": "In Progress"}), (id2, {"priority": "Low"})]
+        results = self.manager.update_tasks_concurrently(updates)
+        self.assertEqual(results, [True, True])
+        self.assertEqual(self.manager.view_tasks()[0].status, "In Progress")
+        self.assertEqual(self.manager.view_tasks()[1].priority, "Low")
+        
 if __name__ == "__main__":
     unittest.main()
