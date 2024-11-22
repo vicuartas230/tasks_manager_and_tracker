@@ -24,8 +24,8 @@ class Task:
 
     def __str__(self):
         return (
-            f"NAME: ({self.name}) CATEGORY: {self.category}"
-            f"DUE: {self.due_date} PRIORITY: {self.priority}"
+            f"NAME: {self.name} | CATEGORY: {self.category} | "
+            f"DUE: {self.due_date} | PRIORITY: {self.priority} | "
             f"STATUS: {self.status}"
         )
 

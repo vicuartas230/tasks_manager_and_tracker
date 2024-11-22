@@ -1,4 +1,5 @@
 from tasks.task import Task
+import json
 
 
 def log_call(func):
@@ -12,7 +13,9 @@ def log_call(func):
         function: Wrapped function with logging.
     """
     def wrapper(*args, **kwargs):
-        print(f"calling {func.__name__} with args: {args}, kwargs: {kwargs}")
+        func_args = args[1:] if len(args) > 0 else args
+        formatted_kwargs = ", ".join(f"{k}: {v}" for k, v in kwargs.items())
+        print(f"calling {func.__name__} with args: {func_args}, kwargs: {{ {formatted_kwargs} }}")
         result = func(*args, **kwargs)
         print(f"{func.__name__} returned: {result}")
         return result
@@ -20,9 +23,8 @@ def log_call(func):
 
 
 class TaskManager:
-    def __init__(self):
-        """Initializes an empty list to store tasks."""
-        self.tasks = []
+    __file_path = "tasks.json"
+    __objects = []
 
     @log_call
     def add_task(self, name, category, due_date, priority, status="Pending"):
@@ -140,7 +142,12 @@ class TaskManager:
 
     def _find_task_by_id(self, task_id):
         """Finds a task by its ID"""
-        for task in self.tasks:
-            if task.task_id == task_id:
-                return task
-        return None
+        try:
+            with open("tasks.json", "r") as f:
+                tasks_data = json.load(f)
+            for task in tasks_data:
+                if task.task_id == task_id:
+                    return task
+            return None
+        except FileNotFoundError:
+            sel
