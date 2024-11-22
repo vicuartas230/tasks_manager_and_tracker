@@ -24,8 +24,8 @@ def log_call(func):
 
 class TaskManager:
     __file_path = "tasks.json"
-    __objects = []
-
+    __tasks = []
+    
     @log_call
     def add_task(self, name, category, due_date, priority, status="Pending"):
         """
@@ -39,7 +39,8 @@ class TaskManager:
             status (str): Initial status. Defaults to 'Pending'.
         """
         task = Task(name, category, due_date, priority, status)
-        self.tasks.append(task)
+        self.__tasks.append(task)
+        self.save_to_file()
         return task
 
     @log_call
@@ -60,6 +61,7 @@ class TaskManager:
         for key, value in kwargs.items():
             if hasattr(task, key):
                 setattr(task, key, value)
+        self.save_to_file()
         return True
 
     def delete_task(self, task_id):
@@ -74,18 +76,24 @@ class TaskManager:
         """
         task = self._find_task_by_id(task_id)
         if task:
-            self.tasks.remove(task)
+            self.__tasks.remove(task)
+            self.save_to_file()
             return True
         return False
 
-    def view_tasks(self):
+    def all_tasks(self):
         """
         Returns a list of all tasks.
 
         Returns:
             list: list of tasks.
         """
-        return self.tasks
+        return self.__tasks
+    
+    def save_to_file(self):
+        with open(self.__file_path, "w") as f:
+            print("FILE: ", f)
+            json.dump([task.__dict__ for task in self.__tasks], f)
 
     def filter_tasks(self, **criteria):
         """
@@ -103,7 +111,7 @@ class TaskManager:
                 getattr(task, key) == value for key, value in criteria.items()
             )
 
-        return list(filter(matches, self.tasks))
+        return list(filter(matches, self.__tasks))
 
     def sort_tasks(self, key="due_date", reverse=False):
         """
@@ -117,7 +125,7 @@ class TaskManager:
             list: Sorted list of tasks
         """
         return sorted(
-            self.tasks, key=lambda task: getattr(task, key), reverse=reverse
+            self.__tasks, key=lambda task: getattr(task, key), reverse=reverse
         )
 
     def update_tasks_concurrently(self, updates):
@@ -143,11 +151,11 @@ class TaskManager:
     def _find_task_by_id(self, task_id):
         """Finds a task by its ID"""
         try:
-            with open("tasks.json", "r") as f:
+            with open(self.__file_path, "r") as f:
                 tasks_data = json.load(f)
             for task in tasks_data:
                 if task.task_id == task_id:
                     return task
             return None
         except FileNotFoundError:
-            sel
+            self.__tasks = []

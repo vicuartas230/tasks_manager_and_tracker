@@ -18,7 +18,7 @@ class Task:
         self.task_id = str(uuid4())
         self.name = name
         self.category = category
-        self.due_date = datetime.strptime(due_date, "%Y-%m-%d")
+        self.due_date = datetime.strptime(due_date, "%Y-%m-%d").isoformat().split('T')[0]
         self.priority = priority
         self.status = status
 

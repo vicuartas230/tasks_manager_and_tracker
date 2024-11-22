@@ -59,7 +59,7 @@ def main():
             args.priority, args.status
         )
         print(f"Task added: {task}")
-        print(f"Current tasks: {[str(task) for task in manager.tasks]}")
+        print(f"Current tasks: {[str(task) for task in manager.all_tasks()]}")
 
     elif args.command == "update":
         updates = {
