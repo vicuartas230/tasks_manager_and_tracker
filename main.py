@@ -4,6 +4,7 @@ from tasks.task_manager import TaskManager
 
 def main():
     manager = TaskManager()
+    manager.reload()
 
     parser = argparse.ArgumentParser(
         description="Task Manager Application",
@@ -58,6 +59,7 @@ def main():
             args.name, args.category, args.due_date,
             args.priority, args.status
         )
+        manager.save()
         print(f"Task added: {task}")
         print(f"Current tasks: {[str(task) for task in manager.all_tasks()]}")
 
@@ -71,10 +73,11 @@ def main():
 
     elif args.command == "delete":
         success = manager.delete_task(args.task_id)
+        manager.save()
         print("Task deleted successfully" if success else "Task not found.")
 
     elif args.command == "view":
-        tasks = manager.view_tasks()
+        tasks = manager.all_tasks()
         if tasks:
             for task in tasks:
                 print(task)

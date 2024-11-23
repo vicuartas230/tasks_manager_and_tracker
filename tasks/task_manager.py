@@ -40,7 +40,6 @@ class TaskManager:
         """
         task = Task(name, category, due_date, priority, status)
         self.__tasks.append(task)
-        self.save_to_file()
         return task
 
     @log_call
@@ -61,7 +60,7 @@ class TaskManager:
         for key, value in kwargs.items():
             if hasattr(task, key):
                 setattr(task, key, value)
-        self.save_to_file()
+        self.save()
         return True
 
     def delete_task(self, task_id):
@@ -77,7 +76,6 @@ class TaskManager:
         task = self._find_task_by_id(task_id)
         if task:
             self.__tasks.remove(task)
-            self.save_to_file()
             return True
         return False
 
@@ -90,10 +88,17 @@ class TaskManager:
         """
         return self.__tasks
     
-    def save_to_file(self):
+    def save(self):
         with open(self.__file_path, "w") as f:
-            print("FILE: ", f)
-            json.dump([task.__dict__ for task in self.__tasks], f)
+            json.dump([task.to_dict() for task in self.__tasks], f)
+            
+    def reload(self):
+        try:
+            with open(self.__file_path, "r") as f:
+                tasks = json.load(f)
+            self.__tasks = [Task.from_dict(task) for task in tasks]
+        except FileNotFoundError:
+            self.__tasks = []
 
     def filter_tasks(self, **criteria):
         """
@@ -150,12 +155,7 @@ class TaskManager:
 
     def _find_task_by_id(self, task_id):
         """Finds a task by its ID"""
-        try:
-            with open(self.__file_path, "r") as f:
-                tasks_data = json.load(f)
-            for task in tasks_data:
-                if task.task_id == task_id:
-                    return task
-            return None
-        except FileNotFoundError:
-            self.__tasks = []
+        for task in self.__tasks:
+            if task.task_id == task_id:
+                return task
+        return None
