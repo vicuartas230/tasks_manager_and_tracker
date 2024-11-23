@@ -1,5 +1,6 @@
 import argparse
 from tasks.task_manager import TaskManager
+from utils.enums import Priority, Status
 
 
 def main():
@@ -19,8 +20,14 @@ def main():
     add_parser.add_argument("name", help="Task name")
     add_parser.add_argument("category", help="Task category")
     add_parser.add_argument("due_date", help="Due date (YYY-MM-DD)")
-    add_parser.add_argument("priority", help="Task priority")
-    add_parser.add_argument("--status", default="Pending", help="Task status")
+    add_parser.add_argument(
+        "priority", choices=[p.value for p in Priority], help="Task priority"
+    )
+    add_parser.add_argument(
+        "--status",
+        choices=[s.value for s in Status],
+        default="Pending", help="Task status"
+    )
 
     update_parser = subparsers.add_parser(
         "update", help="Update an existing task"
@@ -35,8 +42,16 @@ def main():
     update_parser.add_argument(
         "--due_date", type=str, help="New task due_date (YYY-MM-DD)"
     )
-    update_parser.add_argument("--priority", type=str, help="New priority")
-    update_parser.add_argument("--status", type=str, help="New status")
+    update_parser.add_argument(
+        "--priority",
+        choices=[p.value for p in Priority],
+        type=str,
+        help="New priority"
+    )
+    update_parser.add_argument(
+        "--status", choices=[s.value for s in Status],
+        type=str, help="New status"
+    )
 
     delete_parser = subparsers.add_parser("delete", help="Delete a task")
     delete_parser.add_argument(
@@ -69,6 +84,7 @@ def main():
             if k not in ["command", "task_id"] and v is not None
         }
         success = manager.update_task(args.task_id, **updates)
+        manager.save()
         print("Task updated successfully" if success else "Task not found.")
 
     elif args.command == "delete":

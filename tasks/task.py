@@ -1,5 +1,6 @@
 from datetime import datetime
 from uuid import uuid4
+from utils.enums import Priority, Status
 
 
 class Task:
@@ -23,13 +24,19 @@ class Task:
             self.name = args[0]
             self.category = args[1]
             try:
-                self.due_date = datetime.strptime(args[2], "%Y-%m-%d").isoformat().split('T')[0]
+                self.due_date = datetime.strptime(
+                    args[2], "%Y-%m-%d"
+                ).isoformat().split('T')[0]
             except ValueError:
-                raise ValueError(f"Invalid due_date format: {args[2]}. Expected 'YYYY-MM-DD'")
-            self.priority = args[3]
-            self.status = args[4]
-            
+                raise ValueError(
+                    f"Invalid due_date format: "
+                    f"{args[2]}. Expected 'YYYY-MM-DD'"
+                )
+            self.priority = Priority(args[3])
+            self.status = Status(args[4])
+
     def to_dict(self):
+        """Returns a dictionary that contains all attributes of the object"""
         return {
             "task_id": self.task_id,
             "name": self.name,
@@ -38,18 +45,19 @@ class Task:
             "priority": self.priority,
             "status": self.status,
         }
-        
+
     @classmethod
     def from_dict(cls, task_dict):
+        """Returns an instance of Task class created with its key/values"""
         return cls(**task_dict)
 
     def __str__(self):
         return (
             f"NAME: {self.name} | CATEGORY: {self.category} | "
-            f"DUE: {self.due_date} | PRIORITY: {self.priority} | "
-            f"STATUS: {self.status}"
+            f"DUE: {self.due_date} | PRIORITY: {self.priority.value} | "
+            f"STATUS: {self.status.value}"
         )
 
     def is_overdue(self):
         """Checks if the task is overdue."""
-        return self.due_date < datetime.now()
+        return datetime.strptime(self.due_date, "%Y-%m-%d") < datetime.now()

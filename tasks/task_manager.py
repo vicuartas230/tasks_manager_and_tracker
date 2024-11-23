@@ -1,5 +1,6 @@
 from tasks.task import Task
 import json
+from utils.enums import Priority, Status
 
 
 def log_call(func):
@@ -15,7 +16,10 @@ def log_call(func):
     def wrapper(*args, **kwargs):
         func_args = args[1:] if len(args) > 0 else args
         formatted_kwargs = ", ".join(f"{k}: {v}" for k, v in kwargs.items())
-        print(f"calling {func.__name__} with args: {func_args}, kwargs: {{ {formatted_kwargs} }}")
+        print(
+            f"calling {func.__name__} ",
+            f"with args: {func_args}, kwargs: {{ {formatted_kwargs} }}"
+        )
         result = func(*args, **kwargs)
         print(f"{func.__name__} returned: {result}")
         return result
@@ -25,7 +29,7 @@ def log_call(func):
 class TaskManager:
     __file_path = "tasks.json"
     __tasks = []
-    
+
     @log_call
     def add_task(self, name, category, due_date, priority, status="Pending"):
         """
@@ -38,7 +42,9 @@ class TaskManager:
             priority (str): Task priority.
             status (str): Initial status. Defaults to 'Pending'.
         """
-        task = Task(name, category, due_date, priority, status)
+        priority_enum = Priority(priority)
+        status_enum = Status(status)
+        task = Task(name, category, due_date, priority_enum, status_enum)
         self.__tasks.append(task)
         return task
 
@@ -57,10 +63,15 @@ class TaskManager:
         task = self._find_task_by_id(task_id)
         if not task:
             return False
+
         for key, value in kwargs.items():
             if hasattr(task, key):
+                if key == "priority":
+                    value = Priority(value)
+                elif key == "status":
+                    value = Status(value)
                 setattr(task, key, value)
-        self.save()
+
         return True
 
     def delete_task(self, task_id):
@@ -87,12 +98,14 @@ class TaskManager:
             list: list of tasks.
         """
         return self.__tasks
-    
+
     def save(self):
+        """Serializes the list __tasks to the file."""
         with open(self.__file_path, "w") as f:
             json.dump([task.to_dict() for task in self.__tasks], f)
-            
+
     def reload(self):
+        """Deserializes the tasks inside file to the list __tasks."""
         try:
             with open(self.__file_path, "r") as f:
                 tasks = json.load(f)
@@ -129,6 +142,14 @@ class TaskManager:
         Returns:
             list: Sorted list of tasks
         """
+        if key not in ["due_date", "priority", "status", "name"]:
+            raise ValueError(f"Cannot sort by invalid key: {key}")
+        if key == "priority" or key == "status":
+            return sorted(
+                self.__tasks,
+                key=lambda task: getattr(task, key).value,
+                reverse=reverse
+            )
         return sorted(
             self.__tasks, key=lambda task: getattr(task, key), reverse=reverse
         )
