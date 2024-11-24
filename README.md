@@ -66,7 +66,7 @@ python3 main.py delete <task_id>
 ```
 
 ## Testing
-All core functionalities are covered with `uniitest`. To run the rest suite:
+All core functionalities are covered with `unittest`. To run the rest suite:
 ```bash
 python -m unittest discover tests/
 ```
@@ -99,8 +99,3 @@ tasks_manager_and_tracker/
 This project uses the following Python packages:
 - `pytest` (optional for additional testing)
 - Add any other dependencies you've used.
-
-Install them via:
-```bash
-pip install -r requirements.txt
-```
