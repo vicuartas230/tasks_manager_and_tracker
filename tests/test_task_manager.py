@@ -7,26 +7,26 @@ class TestTaskManager(unittest.TestCase):
     def setUp(self):
         self.manager = TaskManager()
         self.manager.add_task(
-            "Task 1", "Work", "2024-11-26", Priority.HIGH, Status.PENDING
+            "Task 1", "Work", "2024-11-26", "High", "Pending"
         )
         self.manager.add_task(
             "Task 2", "Personal",
-            "2024-11-20", Priority.MEDIUM, Status.COMPLETED
+            "2024-11-20", "Medium", "Completed"
         )
 
     def test_add_task(self):
         task = self.manager.add_task(
-            "Task 3", "Urgent", "2024-12-01", Priority.HIGH, Status.PENDING
+            "Task 3", "Urgent", "2024-12-01", "High", "Pending"
         )
         self.assertEqual(len(self.manager.all_tasks()), 3)
         self.assertEqual(task.name, "Task 3")
 
     def test_update_task(self):
         id = self.manager.all_tasks()[0].task_id
-        updated = self.manager.update_task(id, status=Status.COMPLETED)
+        updated = self.manager.update_task(id, Status.COMPLETED)
         self.assertTrue(updated)
         self.assertEqual(
-            self.manager.all_tasks()[0].status, Status.COMPLETED
+            self.manager.all_tasks()[0].status, "Completed"
         )
 
     def test_delete_task(self):

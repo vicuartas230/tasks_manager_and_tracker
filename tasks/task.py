@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import uuid4
-from utils.enums import Priority, Status
+from utils.enums import Priority, Status, priority_map, status_map
 
 
 class Task:
@@ -32,8 +32,8 @@ class Task:
                     f"Invalid due_date format: "
                     f"{args[2]}. Expected 'YYYY-MM-DD'"
                 )
-            self.priority = Priority(args[3])
-            self.status = Status(args[4])
+            self.priority = Priority.parse_priority(args[3])
+            self.status = Status.parse_status(args[4])
 
     def to_dict(self):
         """Returns a dictionary that contains all attributes of the object"""
@@ -42,20 +42,23 @@ class Task:
             "name": self.name,
             "category": self.category,
             "due_date": self.due_date,
-            "priority": self.priority,
-            "status": self.status,
+            "priority": self.priority.name,
+            "status": self.status.name,
         }
 
     @classmethod
     def from_dict(cls, task_dict):
         """Returns an instance of Task class created with its key/values"""
+        task_dict["priority"] = Priority[task_dict["priority"]]
+        task_dict["status"] = Status[task_dict["status"]]
         return cls(**task_dict)
 
     def __str__(self):
         return (
             f"NAME: {self.name} | CATEGORY: {self.category} | "
-            f"DUE: {self.due_date} | PRIORITY: {self.priority.value} | "
-            f"STATUS: {self.status.value}"
+            f"DUE: {self.due_date} | "
+            f"PRIORITY: {priority_map.get(self.priority.value)} | "
+            f"STATUS: {status_map.get(self.status.value)}"
         )
 
     def is_overdue(self):

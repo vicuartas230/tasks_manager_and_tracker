@@ -21,12 +21,15 @@ def main():
     add_parser.add_argument("category", help="Task category")
     add_parser.add_argument("due_date", help="Due date (YYY-MM-DD)")
     add_parser.add_argument(
-        "priority", choices=[p.value for p in Priority], help="Task priority"
+        "priority",
+        # type=Priority.parse_priority,
+        help="Task priority (High, Medium, Low)"
     )
     add_parser.add_argument(
-        "--status",
-        choices=[s.value for s in Status],
-        default="Pending", help="Task status"
+        "status",
+        default="Pending",
+        # type=Status.parse_status,
+        help="Task status (Pending, In Progress, Completed)"
     )
 
     update_parser = subparsers.add_parser(

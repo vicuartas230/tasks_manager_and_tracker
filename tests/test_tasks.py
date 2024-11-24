@@ -1,13 +1,13 @@
 import unittest
 from tasks.task import Task
-from utils.enums import Priority, Status
+from utils.enums import Priority
 
 
 class TestTask(unittest.TestCase):
     def test_create_task(self):
         task = Task(
             "Learn Vue", "Personal", "2024-12-31",
-            Priority.MEDIUM, Status.PENDING
+            "Medium", "Pending"
         )
         self.assertEqual(task.name, "Learn Vue")
         self.assertEqual(task.category, "Personal")
@@ -17,7 +17,7 @@ class TestTask(unittest.TestCase):
     def test_task_overdue(self):
         task = Task(
             "Finish Java Course", "Personal", "2024-11-01",
-            Priority.HIGH, Status.PENDING
+            "High", "Pending"
         )
         self.assertTrue(task.is_overdue())
 

@@ -42,9 +42,9 @@ class TaskManager:
             priority (str): Task priority.
             status (str): Initial status. Defaults to 'Pending'.
         """
-        priority_enum = Priority(priority)
-        status_enum = Status(status)
-        task = Task(name, category, due_date, priority_enum, status_enum)
+        # priority_enum = Priority(priority)
+        # status_enum = Status(status)
+        task = Task(name, category, due_date, priority, status)
         self.__tasks.append(task)
         return task
 
