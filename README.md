@@ -25,48 +25,44 @@ Follow these steps to set up and run the project:
     python3 -m venv .venv
     source .venv/bin/activate
     ```
-3. **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-4. **Run Tests:** Ensure everything is working as expected:
+3. **Run Tests:** Ensure everything is working as expected:
     ```bash
     python -m unittest discover tests/
     ```
-5. **Run the Application:**
+4. **Run the Application:**
     ``` bash
-    python3 tasks/tasks_manager.py
+    python3 main.py
     ```
 
 ## Usage
 ### Adding a Task
 ```python
-from tasks.task_manager import TaskManager
-from tasks.enums import Priority, Status
+python3 main.py add "Task 1" "Personal" "2024-11-30" "High" "Pending"
+```
 
-manager = TaskManager()
-manager.add_task(
-    name="Prepare report",
-    category="Work",
-    due_date="2024-11-25",
-    priority=Priority.HIGH,
-    status=Status.PENDING,
-)
+### Updating a Task
+```python
+python3 main.py update <task_id> --status "In-progress"
+```
+
+### Listing all tasks
+```python
+python3 main.py view
 ```
 
 ### Sorting Tasks
 ```python
-sorted_tasks = manager.sort_tasks(key="priority")
+python3 main.py sort --name --reverse
 ```
 
 ### Filtering Tasks
 ```python
-filtered_tasks = manager.filter_tasks(priority=Priority.High)
+python3 main.py filter --status "Pending"
 ```
 
 ### Deleting a Task
 ```python
-manager.delete_task()
+python3 main.py delete <task_id>
 ```
 
 ## Testing
@@ -78,7 +74,7 @@ python -m unittest discover tests/
 Sample test case:
 ```python
 def test_add_task(self):
-    self.manager.add_task("Test Task", "General", "2024-11-20", Priority.MEDIUM, Status.PENDING)
+    self.manager.add_task("Test Task", "General", "2024-11-20", "Medium", "Pending")
     self.assertEqual(len(self.manager.all_tasks()), 1)
 ```
 

@@ -1,6 +1,7 @@
 from tasks.task import Task
 import json
 from utils.enums import Priority, Status
+from datetime import datetime
 
 
 def log_call(func):
@@ -42,8 +43,6 @@ class TaskManager:
             priority (str): Task priority.
             status (str): Initial status. Defaults to 'Pending'.
         """
-        # priority_enum = Priority(priority)
-        # status_enum = Status(status)
         task = Task(name, category, due_date, priority, status)
         self.__tasks.append(task)
         return task
@@ -67,9 +66,19 @@ class TaskManager:
         for key, value in kwargs.items():
             if hasattr(task, key):
                 if key == "priority":
-                    value = Priority(value)
+                    value = Priority.parse_priority(value)
                 elif key == "status":
-                    value = Status(value)
+                    value = Status.parse_status(value)
+                elif key == "due_date":
+                    try:
+                        value = datetime.strptime(
+                            value, "%Y-%m-%d"
+                        ).isoformat().split('T')[0]
+                    except ValueError:
+                        raise ValueError(
+                            f"Invalid due_date format: "
+                            f"{args[2]}. Expected 'YYYY-MM-DD'"
+                        )
                 setattr(task, key, value)
 
         return True
@@ -125,9 +134,14 @@ class TaskManager:
             list: List of tasks matching the criteria.
         """
         def matches(task):
-            return all(
-                getattr(task, key) == value for key, value in criteria.items()
-            )
+            matches = []
+            for key, value in criteria.items():
+                if key == "priority":
+                    value = Priority.parse_priority(value)
+                elif key == "status":
+                    value = Status.parse_status(value)
+                matches.append(getattr(task, key) == value)
+            return all(matches)
 
         return list(filter(matches, self.__tasks))
 
@@ -144,7 +158,7 @@ class TaskManager:
         """
         if key not in ["due_date", "priority", "status", "name"]:
             raise ValueError(f"Cannot sort by invalid key: {key}")
-        if key == "priority" or key == "status":
+        if key in ["priority", "status"]:
             return sorted(
                 self.__tasks,
                 key=lambda task: getattr(task, key).value,

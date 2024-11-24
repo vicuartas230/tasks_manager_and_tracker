@@ -22,13 +22,11 @@ def main():
     add_parser.add_argument("due_date", help="Due date (YYY-MM-DD)")
     add_parser.add_argument(
         "priority",
-        # type=Priority.parse_priority,
         help="Task priority (High, Medium, Low)"
     )
     add_parser.add_argument(
         "status",
         default="Pending",
-        # type=Status.parse_status,
         help="Task status (Pending, In Progress, Completed)"
     )
 
@@ -45,16 +43,8 @@ def main():
     update_parser.add_argument(
         "--due_date", type=str, help="New task due_date (YYY-MM-DD)"
     )
-    update_parser.add_argument(
-        "--priority",
-        choices=[p.value for p in Priority],
-        type=str,
-        help="New priority"
-    )
-    update_parser.add_argument(
-        "--status", choices=[s.value for s in Status],
-        type=str, help="New status"
-    )
+    update_parser.add_argument("--priority", type=str, help="New priority")
+    update_parser.add_argument("--status", type=str, help="New status")
 
     delete_parser = subparsers.add_parser("delete", help="Delete a task")
     delete_parser.add_argument(
@@ -69,6 +59,16 @@ def main():
     filter_parser.add_argument("--status", help="Filter by status")
     filter_parser.add_argument("--category", help="Filter by category")
     filter_parser.add_argument("--priority", help="Filter by priority")
+
+    sorter_parser = subparsers.add_parser(
+        "sort", help="Sort tasks by criteria in either ASC or DES order"
+    )
+    sort_criteria_group = sorter_parser.add_mutually_exclusive_group()
+    sorter_parser.add_argument("--name", action="store_true", help="Order by name")
+    sorter_parser.add_argument("--due_date", action="store_true", help="Order by due_date")
+    sorter_parser.add_argument("--status", action="store_true", help="Order by status")
+    sorter_parser.add_argument("--priority", action="store_true", help="Order by priority")
+    sorter_parser.add_argument("--reverse", action="store_true", help="Sort in descending order")
 
     args = parser.parse_args()
 
@@ -114,6 +114,21 @@ def main():
                 print(task)
         else:
             print("No tasks match the criteria.")
+
+    elif args.command == "sort":
+        if args.name:
+            key = "name"
+        elif args.status:
+            key = "status"
+        elif args.priority:
+            key = "priority"
+        else:
+            key = "due_date"
+        
+        tasks = manager.sort_tasks(key=key, reverse=args.reverse)
+        
+        for task in tasks:
+            print(task)
 
     else:
         parser.print_help()
