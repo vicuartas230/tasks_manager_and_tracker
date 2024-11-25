@@ -23,10 +23,10 @@ class TestTaskManager(unittest.TestCase):
 
     def test_update_task(self):
         id = self.manager.all_tasks()[0].task_id
-        updated = self.manager.update_task(id, Status.COMPLETED)
+        updated = self.manager.update_task(id, status="Completed")
         self.assertTrue(updated)
         self.assertEqual(
-            self.manager.all_tasks()[0].status, "Completed"
+            self.manager.all_tasks()[0].status, Status.COMPLETED
         )
 
     def test_delete_task(self):
@@ -36,7 +36,7 @@ class TestTaskManager(unittest.TestCase):
         self.assertEqual(len(self.manager.all_tasks()), 4)
 
     def test_filter_tasks(self):
-        filtered = self.manager.filter_tasks(status=Status.COMPLETED)
+        filtered = self.manager.filter_tasks(status="Completed")
         self.assertEqual(len(filtered), 2)
         self.assertEqual(filtered[0].name, "Task 2")
 
@@ -48,8 +48,8 @@ class TestTaskManager(unittest.TestCase):
         id1 = self.manager.all_tasks()[0].task_id
         id2 = self.manager.all_tasks()[1].task_id
         updates = [
-            (id1, {"status": Status.IN_PROGRESS}),
-            (id2, {"priority": Priority.LOW})
+            (id1, {"status": "In-progress"}),
+            (id2, {"priority": "Low"})
         ]
         results = self.manager.update_tasks_concurrently(updates)
         self.assertEqual(results, [True, True])
